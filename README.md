@@ -1,4 +1,7 @@
-tablesorter-simpledateformat
-============================
+# Tablesorter SimpleDateFormat parser
 
-SimpleDateFormat support for Christian Bach's tablesorter jQuery plugin
+SimpleDateFormat parser for Christian Bach's tablesorter jQuery plugin (http://plugins.jquery.com/tablesorter/)
+
+
+## Features:
+- Caches the [format, SimpleDateFormatter]
