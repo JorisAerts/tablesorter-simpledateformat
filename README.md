@@ -8,7 +8,7 @@ SimpleDateFormat parser for Christian Bach's tablesorter jQuery plugin (http://p
 
 ## Date & Time Patterns:
 | Supported | Letter | Date or Time Component | Presentation | Examples |
-| --------- | ------ | ---------------------- | ------------ | -------- |
+|:---------:|:------:| ---------------------- | ------------ | -------- |
 |   | G | Era designator | Text | AD |
 | x | y | Year | Year | 1996; 96 |
 |   | Y | Week year | Year | 2009; 09 |
