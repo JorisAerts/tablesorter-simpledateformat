@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JavaScript Calendar" default="all" basedir=".">
+
+
+	<!-- Properties and Settings -->
+	
+	<property name="target.file" value="jquery.tablesorter.simpledateformat.js" />
+	<property name="target.file.min" value="jquery.tablesorter.simpledateformat.min.js" />
+
+
+	<!-- Glue everything togther -->
+	<target name="concat">
+		<concat destfile="${target.file}" fixlastline="yes" overwrite="yes" encoding="utf-8" eol="cr">
+			<!-- Add some JavaScript doc, and the immediate function -->
+			<header filtering="no" trimleading="yes" trim="yes">
+				(function(global){
+			</header>
+
+			<fileset file="simpledateformat.js/simpledateformat.js" />
+			<fileset file="src/parser.js" />
+			
+			<!-- Assign the Calendar object to global namespace, and close the immediate function -->
+			<footer filtering="no" trimleading="yes" trim="yes">})();</footer>
+		</concat>
+	</target>
+
+
+	<!-- Clean generated code -->
+	<target name="clean">
+		<delete file="${target.file}" failonerror="no" />
+		<delete file="${target.file.min}" failonerror="no" />
+	</target>
+
+
+	<!-- Shortcuts -->
+	<target name="all" depends="clean, concat" />
+
+</project>
