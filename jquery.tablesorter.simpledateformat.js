@@ -66,6 +66,7 @@
                 return ret ? (jQuery.isFunction(ret) ? ret : function (format, value, date) {
                     date[ret](parseInt(value,10) + (increase || 0), 10)
                 }) : function () {
+                    // dummy function, nothing happens really...
                 };
             },
 
@@ -73,7 +74,7 @@
                 var a = arguments;
                 return {
                     pattern:    a[0],
-                    parse:        _createValue.apply(this, [].slice.call(a, 1))
+                    parse:      _createValue.apply(this, [].slice.call(a, 1))
                 };
             },
 
@@ -86,12 +87,14 @@
                     value = parseInt(value,10);
                     date[format.length > 2 ? "setFullYear" : "setYear"](value);
                 }),
-                "M": _createPattern(RegExBuilder.wordChar(), function (format, value, date) {
+                "M": _createPattern(RegExBuilder.wordChar(), function (format, value, date, locale) {
                     var l = format.length;
-                    if (l == 3) {
-                        value = Months.indexOf(value);
-                    } else {
+                    if (l < 3) {
                         value = parseInt(value, 10);
+                    } else if (l == 3) {
+                        value = locale.MonthsShort.indexOf(value);
+                    } else if (l > 3) {
+                        value = locale.Months.indexOf(value);
                     }
                     date.setMonth(value - 1);
                 }),
@@ -111,34 +114,46 @@
                 return new RegExp("'.*'|[" + s + "]+", "g");
             }(),
 
-            /*
 
-            // NOT YET FULLY SUPPORTED IN ALL BROWSERS:
+            // Feature Tested: NOT YET FULLY SUPPORTED IN ALL BROWSERS!
+            getLocale = function(){
 
-            getLocaleString = function(locale, d, v){
-                var opts = { weekday: "long" };
-                //opts[v] = "long";
-                return(d.toLocaleString(locale,opts));
-            },
-            getLocale = function (locale) {
-                var dateRef = new Date(),
-                    year = dateRef.getFullYear(),
-                    day,
-                    ret = { days: [], months: []  };
-                dateRef.setMonth(0);
-                dateRef.setDate(0);
-                day = dateRef.getDay();
-                for (var i = 0; i < 7; i++) {
-                    ret.days[(7 + i - day) % 7] = getLocaleString(locale, dateRef, "weekday");
-                    dateRef.setMonth(dateRef.getMonth() + 1);
+                if(new Date().toLocaleString() === new Date().toLocaleString("en", { month: "long" })){
+                    // No locale browser support
+                    return function(locale) {
+                        return SimpleDateFormat.Locale[locale] ? SimpleDateFormat.Locale[locale] : SimpleDateFormat.Locale["en"];
+                    };
+
                 }
-                while (year == dateRef.getFullYear()) {
-                    ret.months.push(getLocaleString(locale, dateRef, "month"));
-                    dateRef.setMonth(dateRef.getMonth() + 1);
+
+                function getLocaleString(locale, d, v, type){
+                    var opts = { };
+                    opts[v] = type || "long";
+                    return(d.toLocaleString(locale,opts));
                 }
-                return ret;
-            }
-            */
+
+                // browser support for locale!
+                return function (locale) {
+                    var dateRef = new Date(),
+                        year = dateRef.getFullYear(),
+                        day,
+                        ret = { days: [], months: []  };
+                    dateRef.setMonth(0);
+                    dateRef.setDate(0);
+                    day = dateRef.getDay();
+                    for (var i = 0; i < 7; i++) {
+                        ret.days[(7 + i - day) % 7] = getLocaleString(locale, dateRef, "weekday");
+                        dateRef.setMonth(dateRef.getMonth() + 1);
+                    }
+                    while (year == dateRef.getFullYear()) {
+                        ret.months.push(getLocaleString(locale, dateRef, "month"));
+                        dateRef.setMonth(dateRef.getMonth() + 1);
+                    }
+                    return ret;
+                }
+
+            }(),
+
 
             _getLocale = function(cache){
                 return function(locale) {
@@ -188,7 +203,7 @@
                     pattern = index[i - 1],
                         c = pattern.charAt(0);
                     if (Patterns.hasOwnProperty(c)) {
-                        Patterns[c].parse(pattern, match[i], date);
+                        Patterns[c].parse(pattern, match[i], date, locale);
                     }
                 }
                 return date;
@@ -204,7 +219,7 @@
         SimpleDateFormat.prototype = {
 
             /** parse a String into a Date */
-            parse: function (value) { return _parseDate(value, this.pattern); },
+            parse: function (value) { return _parseDate(value, this.pattern, this.locale); },
 
             /** format a Date into a String */
             format: function (date) { }
