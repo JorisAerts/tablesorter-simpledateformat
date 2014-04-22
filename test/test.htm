@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SimpleDateFormat parser test</title>
+  </head>
+  <style><!--
+
+    html, body { font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; }
+
+    table, th, td {
+      border: 3px solid #666;
+      border-collapse: collapse;
+    }
+
+    th {
+      background-color: #ddd;
+    }
+
+    th, td {
+      padding: 1em;
+    }
+
+  --></style>
+  <body>
+    <h1>SimpleDateFormat parser test</h1>
+    <table>
+      <thead>
+        <tr><th data-dateFormat="dd-MM-yyyy HH:mm:ss.SSS">Col 1</th><th>Col 2</th><th>Col 3</th><th>Col 4</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>17-12-2014 12:34:56.789</td><td>b</td><td>c</td><td>d</td></tr>
+        <tr><td>22-09-1984 10:00:00.000</td><td>Z</td><td>A</td><td>C</td></tr>
+        <tr><td>20-10-2012 23:59:59.999</td><td>g</td><td>f</td><td>e</td></tr>
+        <tr><td>02-04-1981 01:05:22.100</td><td>j</td><td>k</td><td>l</td></tr>
+      </tbody>
+    </table>
+
+    <script src="//code.jquery.com/jquery-2.1.0.min.js" ></script>
+    <script src="http://mottie.github.io/tablesorter/js/jquery.tablesorter.min.js"></script>
+    <script src="../jquery.tablesorter.simpledateformat.js" ></script>
+    <script>
+      jQuery(function(){
+        jQuery("table").tablesorter({
+          headers: {
+            0: { sorter : "SimpleDateFormat" }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
