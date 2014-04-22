@@ -214,7 +214,7 @@
                     regex = ref[0],
                     index = ref[1],
                     match = source.match(regex),
-                    i = 1, l = match.length,
+                    i = 1, l = match ? match.length : 0,
                     date = new Date(0),
                     c;
                 for (; i < l; i++) {
