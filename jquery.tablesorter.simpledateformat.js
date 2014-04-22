@@ -39,6 +39,10 @@
                 return "\\" + value;
             },
 
+            _int = function(value) {
+                return parseInt(value, 10);
+            },
+
             RegExBuilder = {
                 len: function (options) {
                     options = options || {};
@@ -55,16 +59,20 @@
                         return a.length < 2 ? a[0] : "(" + [].join.call(a, "|") + ")";
                     }
                 },
-                wordChar: function (value) {
+                wordChar: function (decimal, word) {
                     return function () {
-                        return "([\\w\\d]+)";
+                        if(decimal == word && word !== false){
+                            return "([\\w\\d]+)";
+                        }else{
+                            return "(" + (word !== false ? "\\w" : "") + (decimal !== false ? "\\d" : "") + "+)";
+                        }
                     }
                 }
             },
 
             _createValue = function (ret, increase) {
                 return ret ? (jQuery.isFunction(ret) ? ret : function (format, value, date) {
-                    date[ret](parseInt(value,10) + (increase || 0), 10)
+                    date[ret](_int(value) + (increase || 0), 10)
                 }) : function () {
                     // dummy function, nothing happens really...
                 };
@@ -80,17 +88,17 @@
 
             Patterns = {
                 "Y": _createPattern(RegExBuilder.len(), function (format, value, date) {
-                    value = parseInt(value,10);
+                    value = _int(value);
                     date[format.length > 2 ? "setFullYear" : "setYear"](value);
                 }),
                 "y": _createPattern(RegExBuilder.len(), function (format, value, date) {
-                    value = parseInt(value,10);
+                    value = _int(value);
                     date[format.length > 2 ? "setFullYear" : "setYear"](value);
                 }),
                 "M": _createPattern(RegExBuilder.wordChar(), function (format, value, date, locale) {
                     var l = format.length;
                     if (l < 3) {
-                        value = parseInt(value, 10);
+                        value = _int(value);
                     } else if (l == 3) {
                         value = locale.MonthsShort.indexOf(value);
                     } else if (l > 3) {
@@ -102,7 +110,18 @@
                 "H": _createPattern(RegExBuilder.len(), "setHours"),
                 "m": _createPattern(RegExBuilder.len(), "setMinutes"),
                 "s": _createPattern(RegExBuilder.len(), "setSeconds"),
-                "S": _createPattern(RegExBuilder.len(), "setMilliseconds")
+                "S": _createPattern(RegExBuilder.len(), "setMilliseconds"),
+
+                // Day name
+                "E": _createPattern(RegExBuilder.wordChar(false), function(format, value, date, locale){
+                    var l = format.length, current = date.getDay();
+                    if (l < 4) {
+                        value = locale.DaysShort.indexOf(value);
+                    } else if (l > 3) {
+                        value = locale.Days.indexOf(value);
+                    }
+                    date.setDate(date.getDate() + (7 + value - current) % 7);
+                })
             },
 
             /** The regular expression, used to decode the pattern */
@@ -113,7 +132,6 @@
                 }
                 return new RegExp("'.*'|[" + s + "]+", "g");
             }(),
-
 
             // Feature Tested: NOT YET FULLY SUPPORTED IN ALL BROWSERS!
             getLocale = function(){
@@ -246,6 +264,10 @@
         return SimpleDateFormat;
 
     }({});
+
+
+    // Create and add the parser to TableSorter
+
 
     function getFormat(s, table, cell, cellIndex){
         var c = table.config,
