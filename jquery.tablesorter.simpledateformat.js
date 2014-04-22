@@ -95,15 +95,15 @@ var SimpleDateFormat = function (_cache) {
 			"M": _createPattern(RegExBuilder.wordChar(), function (format, value, date, locale) {
 				var l = format.length;
 				if (l < 3) {
-					value = _int(value);
+					value = _int(value) - 1;
 				} else if (l == 3) {
 					value = locale.MonthsShort.indexOf(value);
 				} else if (l > 3) {
 					value = locale.Months.indexOf(value);
 				}
-				date.setMonth(value - 1);
+				date.setMonth(value);
 			}),
-			"d": _createPattern(RegExBuilder.len(), "setDate", -1),
+			"d": _createPattern(RegExBuilder.len(), "setDate"),
 			"H": _createPattern(RegExBuilder.len(), "setHours"),
 			"m": _createPattern(RegExBuilder.len(), "setMinutes"),
 			"s": _createPattern(RegExBuilder.len(), "setSeconds"),
